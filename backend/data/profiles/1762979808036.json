@@ -1,0 +1,55 @@
+{
+  "id": "1762979808036",
+  "personalInfo": {
+    "fullName": "Sarthak Dwivedi",
+    "email": "sarthakdwivedi219@gmail.com",
+    "phone": "06394835872",
+    "address": "Awas Vikas No1",
+    "linkedin": "https://www.linkedin.com/in/sarthak-dwivedi-609647277/",
+    "website": "https://github.com/sarthak-dwivedi"
+  },
+  "summary": "",
+  "education": [
+    {
+      "institution": "Guru Nanak Public Senior Secondary School",
+      "degree": "10th",
+      "field": "CBSE",
+      "startDate": "",
+      "endDate": "",
+      "gpa": "97"
+    },
+    {
+      "institution": "Guru Nanak Public Senior Secondary School",
+      "degree": "12th",
+      "field": "CBSE",
+      "startDate": "",
+      "endDate": "",
+      "gpa": "97"
+    }
+  ],
+  "experience": [
+    {
+      "company": "block chain",
+      "position": "Leader",
+      "location": "Kanpur",
+      "startDate": "",
+      "endDate": "",
+      "description": ""
+    }
+  ],
+  "skills": {
+    "technical": "",
+    "soft": "",
+    "languages": ""
+  },
+  "projects": [
+    {
+      "name": "Fraud detection in banking transaction",
+      "description": "Detected fraud in banking transactions using ML and DL models trained on historical data to improve accuracy\n • Applied advanced feature engineering and One-Hot Encoding on 100K+ transactions, significantly boosting model performance, recall, and accuracy.\n • Resolved class imbalance via SMOTE, normalized dataset with Robust Scaler, and selected optimal features through Z-test analysis for better results.\n • Developed models using XGBoost and Artificial Neural Networks, achieving an F1 score of 0.87 and an AUC of 0.90 enhancing fraud detection by 30%.",
+      "technologies": "",
+      "link": ""
+    }
+  ],
+  "certifications": " Completed ISO-certified Ethical Hacking course, gaining essential cybersecurity and penetration testing\n skills.",
+  "updatedAt": "2025-11-12T20:36:48.036Z"
+}

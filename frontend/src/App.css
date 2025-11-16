@@ -1,0 +1,149 @@
+.App {
+  min-height: 100vh;
+  width: 100%;
+}
+
+.app-header {
+  text-align: center;
+  padding: 2rem 1rem 2.5rem;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  border-bottom: 3px solid #646cff;
+}
+
+.app-header h1 {
+  font-size: 2.5rem;
+  line-height: 1.1;
+  color: #646cff;
+  margin: 0;
+  background: linear-gradient(135deg, #646cff 0%, #8b92ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  color: #888;
+  font-size: 1.1rem;
+  margin: 0.5rem 0 2rem;
+}
+
+.progress-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.progress-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.step-number {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #333;
+  color: #888;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  border: 2px solid #444;
+  transition: all 0.3s;
+}
+
+.progress-step.active .step-number {
+  background: #646cff;
+  color: white;
+  border-color: #646cff;
+  box-shadow: 0 0 12px rgba(100, 108, 255, 0.5);
+}
+
+.progress-step.completed .step-number {
+  background: #10b981;
+  color: white;
+  border-color: #10b981;
+}
+
+.step-label {
+  font-size: 0.85rem;
+  color: #888;
+  font-weight: 500;
+}
+
+.progress-step.active .step-label {
+  color: #646cff;
+}
+
+.progress-step.completed .step-label {
+  color: #10b981;
+}
+
+.progress-line {
+  height: 2px;
+  width: 80px;
+  background: #444;
+  margin: 0 0.5rem;
+  margin-bottom: 1.5rem;
+  transition: all 0.3s;
+}
+
+.progress-line.completed {
+  background: #10b981;
+}
+
+.app-main {
+  padding: 2rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.restart-container {
+  text-align: center;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #333;
+}
+
+.restart-btn {
+  padding: 0.75rem 1.5rem;
+  background: #333;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.restart-btn:hover {
+  background: #444;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .app-header h1 {
+    font-size: 2rem;
+  }
+  
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .progress-bar {
+    padding: 0;
+  }
+
+  .progress-line {
+    width: 40px;
+  }
+
+  .step-label {
+    font-size: 0.75rem;
+  }
+}

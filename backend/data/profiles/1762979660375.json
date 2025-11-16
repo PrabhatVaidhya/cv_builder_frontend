@@ -1,0 +1,55 @@
+{
+  "id": "1762979660375",
+  "personalInfo": {
+    "fullName": "Sarthak Dwivedi",
+    "email": "sarthakdwivedi219@gmail.com",
+    "phone": "06394835872",
+    "address": "Awas Vikas No1",
+    "linkedin": "https://www.linkedin.com/in/sarthak-dwivedi-609647277/",
+    "website": "https://github.com/sarthak-dwivedi"
+  },
+  "summary": "",
+  "education": [
+    {
+      "institution": "Guru Nanak Public Senior Secondary School",
+      "degree": "10th",
+      "field": "CBSE",
+      "startDate": "2019-04",
+      "endDate": "2020-03",
+      "gpa": "97"
+    },
+    {
+      "institution": "Guru Nanak Public Senior Secondary School",
+      "degree": "12th",
+      "field": "CBSE",
+      "startDate": "2021-04",
+      "endDate": "2022-03",
+      "gpa": "97"
+    }
+  ],
+  "experience": [
+    {
+      "company": " District Blockchain Innovation Challenge | Finalist",
+      "position": "Leader",
+      "location": "Kanpur",
+      "startDate": "2025-03",
+      "endDate": "2025-09",
+      "description": "Participated in district-level blockchain competition focused on building decentralized solutions for governance and finance\n [Dec’24]\n • Developed a functional prototype for a blockchain-based land record system to improve transparency, enhance security, and reduce ownership\n disputes.\n • Applied sma"
+    }
+  ],
+  "skills": {
+    "technical": "Programming Languages: C, C++, Python, SQL\n",
+    "soft": " Libraries & Frameworks: Tensorflow, Keras, Scikit-Learn, Pandas, Numpy, PyTorch, Matplotlib, Seaborn\n",
+    "languages": " Software & Tools: MS-Excel, Jupyter Notebook, Anaconda, LangChain, Kaggle, STATA, Canva"
+  },
+  "projects": [
+    {
+      "name": "Fraud detection in banking transaction",
+      "description": "Detected fraud in banking transactions using ML and DL models trained on historical data to improve accuracy\n • Applied advanced feature engineering and One-Hot Encoding on 100K+ transactions, significantly boosting model performance, recall, and accuracy.\n • Resolved class imbalance via SMOTE, normalized dataset with Robust Scaler, and selected optimal features through Z-test analysis for better results.\n • Developed models using XGBoost and Artificial Neural Networks, achieving an F1 score of 0.87 and an AUC of 0.90 enhancing fraud detection by 30%.",
+      "technologies": "",
+      "link": ""
+    }
+  ],
+  "certifications": " Completed ISO-certified Ethical Hacking course, gaining essential cybersecurity and penetration testing\n skills.",
+  "updatedAt": "2025-11-12T20:34:20.375Z"
+}

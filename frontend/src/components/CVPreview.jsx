@@ -2,6 +2,8 @@ import { useRef } from 'react'
 import './CVPreview.css'
 
 function CVPreview({ cvData, similarity, onBack, onDownload }) {
+  const apiEndpoint = import.meta.env.VITE_API_URL;
+
   const previewRef = useRef(null)
 
   const getSimilarityColor = (score) => {
@@ -19,7 +21,7 @@ function CVPreview({ cvData, similarity, onBack, onDownload }) {
 
   const handleDownload = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/profile/generate-pdf', {
+      const response = await fetch('${apiEndpoint}/api/profile/generate-pdf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(cvData)

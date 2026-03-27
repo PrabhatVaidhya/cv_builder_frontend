@@ -9,6 +9,8 @@ export default function CVGenerator({ userEmail }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const apiEndpoint = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
     fetchGeneratedCVs();
   }, [userEmail]);
@@ -16,7 +18,7 @@ export default function CVGenerator({ userEmail }) {
   const fetchGeneratedCVs = async () => {
     try {
       setError(null);
-      const response = await fetch(`http://localhost:5000/api/auth/cvs/${userEmail}`);
+      const response = await fetch(`${apiEndpoint}/api/auth/cvs/${userEmail}`);
       const data = await response.json();
       if (data.success) {
         setGeneratedCVs(data.data || []);
@@ -37,7 +39,7 @@ export default function CVGenerator({ userEmail }) {
 
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/auth/generate-cv', {
+      const response = await fetch('${apiEndpoint}/api/auth/generate-cv', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -66,7 +68,7 @@ export default function CVGenerator({ userEmail }) {
 
   const downloadCV = async (cvId) => {
     try {
-      const response = await fetch('http://localhost:5000/api/auth/download-cv', {
+      const response = await fetch('${apiEndpoint}/api/auth/download-cv', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cvId })
@@ -94,7 +96,7 @@ export default function CVGenerator({ userEmail }) {
   const viewCV = async (cvId) => {
     console.log('View CV clicked, cvId:', cvId);
     try {
-      const response = await fetch(`http://localhost:5000/api/auth/cv/${cvId}`);
+      const response = await fetch(`${apiEndpoint}/api/auth/cv/${cvId}`);
       console.log('View CV response status:', response.status);
       
       if (!response.ok) {
@@ -154,7 +156,7 @@ export default function CVGenerator({ userEmail }) {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/api/auth/cv/${cvId}`, {
+      const response = await fetch(`${apiEndpoint}/api/auth/cv/${cvId}`, {
         method: 'DELETE'
       });
 

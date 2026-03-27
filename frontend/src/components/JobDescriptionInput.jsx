@@ -7,7 +7,10 @@ function JobDescriptionInput({ userEmail, parsedProfile, onCVGenerated }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  const apiEndpoint = import.meta.env.VITE_API_URL;
+
   const exampleJob = `Senior Full Stack Developer
+  
 
 We are seeking a talented Full Stack Developer to join our team.
 
@@ -58,14 +61,14 @@ Nice to have:
           }
         }
         
-        await fetch('http://localhost:5000/api/profile/save-profile', {
+        await fetch('${apiEndpoint}/api/profile/save-profile', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(updatedProfile)
         })
       }
 
-      const response = await fetch('http://localhost:5000/api/profile/generate-tailored-cv', {
+      const response = await fetch('${apiEndpoint}/api/profile/generate-tailored-cv', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

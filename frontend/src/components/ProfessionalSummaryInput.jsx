@@ -6,6 +6,8 @@ function ProfessionalSummaryInput({ onParsed }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  const apiEndpoint = import.meta.env.VITE_API_URL;
+
   const exampleText = `I am John Doe, a Senior Software Engineer with 5 years of experience in full-stack development. 
   
 I graduated from MIT with a BS in Computer Science in 2018, GPA 3.8. 
@@ -32,7 +34,7 @@ Contact: john.doe@email.com, +1-555-0123, LinkedIn: linkedin.com/in/johndoe`
     setError('')
 
     try {
-      const response = await fetch('http://localhost:5000/api/profile/parse-summary', {
+      const response = await fetch('${apiEndpoint}/api/profile/parse-summary', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ professionalSummary: summary })

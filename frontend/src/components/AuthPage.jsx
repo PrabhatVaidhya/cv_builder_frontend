@@ -8,7 +8,9 @@ export default function AuthPage({ onLogin }) {
   const [fullName, setFullName] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const api = (path, body) => fetch(`http://localhost:5000/api/auth/${path}`, {
+  const apiEndpoint = import.meta.env.VITE_API_URL;
+
+  const api = (path, body) => fetch(`${apiEndpoint}/api/auth/${path}`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
   }).then(r => r.json())
 

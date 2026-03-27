@@ -4,6 +4,8 @@ export default function ProfileForm({ userEmail, onComplete }) {
   const [rawSummary, setRawSummary] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const apiEndpoint = import.meta.env.VITE_API_URL;
+
   const loadDemoData = () => {
     const demoSummary = `Sarthak Sharma
 sarthaksharma@example.com | +91-9876543210 | LinkedIn: linkedin.com/in/sarthaksharma
@@ -62,7 +64,7 @@ CERTIFICATIONS:
     setLoading(true);
     try {
       // Parse the unstructured summary using AI
-      const parseResponse = await fetch('http://localhost:5000/api/profile/parse', {
+      const parseResponse = await fetch('${apiEndpoint}/api/profile/parse', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ summary: rawSummary })
@@ -76,7 +78,7 @@ CERTIFICATIONS:
       }
 
       // Save the parsed profile to the user account
-      const saveResponse = await fetch('http://localhost:5000/api/auth/profile', {
+      const saveResponse = await fetch('${apiEndpoint}/api/auth/profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 

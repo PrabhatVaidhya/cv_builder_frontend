@@ -10,6 +10,8 @@ function App() {
   const [profileCompleted, setProfileCompleted] = useState(false)
   const [loading, setLoading] = useState(true)
 
+  const apiEndpoint = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
     const email = localStorage.getItem('userEmail')
     if (email) {
@@ -23,7 +25,7 @@ function App() {
 
   const checkProfileStatus = async (email) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/auth/profile/${email}`)
+      const response = await fetch(`${apiEndpoint}/api/auth/profile/${email}`)
       const data = await response.json()
       if (data.success && data.data.profileCompleted) {
         setProfileCompleted(true)
@@ -114,7 +116,7 @@ function App() {
 
   const handleViewProfile = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/auth/profile/${userEmail}`);
+      const response = await fetch(`${apiEndpoint}/api/auth/profile/${userEmail}`);
       const data = await response.json();
       if (data.success) {
         alert('Opening profile view...');

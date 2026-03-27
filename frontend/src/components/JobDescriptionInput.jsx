@@ -61,14 +61,14 @@ Nice to have:
           }
         }
         
-        await fetch('${apiEndpoint}/api/profile/save-profile', {
+        await fetch(`${apiEndpoint}/api/profile/save-profile`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(updatedProfile)
         })
       }
 
-      const response = await fetch('${apiEndpoint}/api/profile/generate-tailored-cv', {
+      const response = await fetch(`${apiEndpoint}/api/profile/generate-tailored-cv`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

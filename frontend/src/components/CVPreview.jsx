@@ -21,7 +21,7 @@ function CVPreview({ cvData, similarity, onBack, onDownload }) {
 
   const handleDownload = async () => {
     try {
-      const response = await fetch('${apiEndpoint}/api/profile/generate-pdf', {
+      const response = await fetch(`${apiEndpoint}/api/profile/generate-pdf`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(cvData)

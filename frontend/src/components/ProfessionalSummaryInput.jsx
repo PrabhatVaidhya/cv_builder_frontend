@@ -34,7 +34,7 @@ Contact: john.doe@email.com, +1-555-0123, LinkedIn: linkedin.com/in/johndoe`
     setError('')
 
     try {
-      const response = await fetch('${apiEndpoint}/api/profile/parse-summary', {
+      const response = await fetch(`${apiEndpoint}/api/profile/parse-summary`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ professionalSummary: summary })

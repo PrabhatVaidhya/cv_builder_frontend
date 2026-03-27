@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import './AuthPage.css'
 
 export default function AuthPage({ onLogin }) {
   const [mode, setMode] = useState('login') // or 'register'
@@ -36,23 +37,23 @@ export default function AuthPage({ onLogin }) {
   }
 
   return (
-    <div style={{ maxWidth: 520, margin: '20px auto', padding: 20, border: '1px solid #eee', borderRadius: 6 }}>
+    <div className="auth-container">
       <h2>{mode === 'login' ? 'Sign In' : 'Create Account'}</h2>
       <form onSubmit={handleSubmit}>
         {mode === 'register' && (
-          <div style={{ marginBottom: 8 }}>
-            <input placeholder="Full name" value={fullName} onChange={e => setFullName(e.target.value)} style={{width: '100%'}} />
+          <div className="auth-field">
+            <input placeholder="Full name" value={fullName} onChange={e => setFullName(e.target.value)} />
           </div>
         )}
-        <div style={{ marginBottom: 8 }}>
-          <input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} style={{width: '100%'}} />
+        <div className="auth-field">
+          <input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
         </div>
-        <div style={{ marginBottom: 8 }}>
-          <input placeholder="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} style={{width: '100%'}} />
+        <div className="auth-field">
+          <input placeholder="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} />
         </div>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button type="submit" disabled={loading}>{loading ? 'Please wait...' : mode === 'login' ? 'Sign In' : 'Register'}</button>
-          <button type="button" onClick={() => setMode(mode === 'login' ? 'register' : 'login')}>{mode === 'login' ? 'Create account' : 'Have an account? Sign in'}</button>
+        <div className="auth-btns">
+          <button className="btn btn-primary" type="submit" disabled={loading}>{loading ? 'Please wait...' : mode === 'login' ? 'Sign In' : 'Register'}</button>
+          <button className="btn btn-secondary" type="button" onClick={() => setMode(mode === 'login' ? 'register' : 'login')}>{mode === 'login' ? 'Create account' : 'Have an account? Sign in'}</button>
         </div>
       </form>
     </div>

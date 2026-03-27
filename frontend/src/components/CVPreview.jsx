@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import './CVPreview.css'
 
 function CVPreview({ cvData, similarity, onBack, onDownload }) {
-  const apiEndpoint = import.meta.env.VITE_API_URL;
+  const apiEndpoint = import.meta.env.VITE_API_URL || 'https://cv-builder-frontend-1v0e.onrender.com';
 
   const previewRef = useRef(null)
 

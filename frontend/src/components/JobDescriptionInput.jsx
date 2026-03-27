@@ -7,7 +7,7 @@ function JobDescriptionInput({ userEmail, parsedProfile, onCVGenerated }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const apiEndpoint = import.meta.env.VITE_API_URL;
+  const apiEndpoint = import.meta.env.VITE_API_URL || 'https://cv-builder-frontend-1v0e.onrender.com';
 
   const exampleJob = `Senior Full Stack Developer
   

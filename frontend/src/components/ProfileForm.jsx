@@ -4,7 +4,7 @@ export default function ProfileForm({ userEmail, onComplete }) {
   const [rawSummary, setRawSummary] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const apiEndpoint = import.meta.env.VITE_API_URL;
+  const apiEndpoint = import.meta.env.VITE_API_URL || 'https://cv-builder-frontend-1v0e.onrender.com';
 
   const loadDemoData = () => {
     const demoSummary = `Sarthak Sharma

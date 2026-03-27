@@ -9,7 +9,7 @@ export default function CVGenerator({ userEmail }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const apiEndpoint = import.meta.env.VITE_API_URL;
+  const apiEndpoint = import.meta.env.VITE_API_URL || 'https://cv-builder-frontend-1v0e.onrender.com';
 
   useEffect(() => {
     fetchGeneratedCVs();
@@ -452,7 +452,8 @@ Go, Kubernetes, Docker, gRPC, Google Cloud Platform, Microservices, Distributed 
             border: '1px solid #dee2e6',
             fontFamily: 'Arial, sans-serif',
             lineHeight: '1.6',
-            color: '#000'
+            color: '#000',
+            textAlign: 'left'
           }}>
             {/* Header */}
             <div style={{ textAlign: 'center', marginBottom: '20px', borderBottom: '2px solid #000', paddingBottom: '10px' }}>

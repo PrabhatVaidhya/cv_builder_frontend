@@ -10,7 +10,7 @@ function App() {
   const [profileCompleted, setProfileCompleted] = useState(false)
   const [loading, setLoading] = useState(true)
 
-  const apiEndpoint = import.meta.env.VITE_API_URL;
+  const apiEndpoint = import.meta.env.VITE_API_URL || 'https://cv-builder-frontend-1v0e.onrender.com';
 
   useEffect(() => {
     const email = localStorage.getItem('userEmail')

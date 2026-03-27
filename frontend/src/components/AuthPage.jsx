@@ -8,7 +8,7 @@ export default function AuthPage({ onLogin }) {
   const [fullName, setFullName] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const apiEndpoint = import.meta.env.VITE_API_URL;
+  const apiEndpoint = import.meta.env.VITE_API_URL || 'https://cv-builder-frontend-1v0e.onrender.com';
 
   const api = (path, body) => fetch(`${apiEndpoint}/api/auth/${path}`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)

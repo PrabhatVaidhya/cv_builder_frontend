@@ -6,7 +6,7 @@ function ProfessionalSummaryInput({ onParsed }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const apiEndpoint = import.meta.env.VITE_API_URL;
+  const apiEndpoint = import.meta.env.VITE_API_URL || 'https://cv-builder-frontend-1v0e.onrender.com';
 
   const exampleText = `I am John Doe, a Senior Software Engineer with 5 years of experience in full-stack development. 
   

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const { createUser, findUserByEmail, updateUserProfile, saveGeneratedCV, getGeneratedCVs, getGeneratedCVById, deleteGeneratedCV } = require('../services/userService');
-const { tailorCVForJob } = require('../services/aiService');
+const { tailorCVForJob, generateCoverLetter } = require('../services/aiService');
 const { generatePDF } = require('../services/cvService');
 
 // Register
@@ -128,6 +128,37 @@ router.post('/generate-cv', async (req, res) => {
     });
   } catch (err) {
     console.error('Generate CV error:', err);
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// Generate Cover Letter
+router.post('/generate-cover-letter', async (req, res) => {
+  try {
+    const { email, jobDescription } = req.body;
+    if (!email || !jobDescription) {
+      return res.status(400).json({ success: false, message: 'Email and job description required' });
+    }
+
+    const user = await findUserByEmail(email);
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+    if (!user.profileCompleted) {
+      return res.status(400).json({ success: false, message: 'Please complete your profile first' });
+    }
+
+    const coverLetterData = await generateCoverLetter(user, jobDescription);
+
+    if (!coverLetterData.success) {
+      return res.status(500).json({ success: false, message: 'Failed to generate cover letter' });
+    }
+
+    return res.json({ 
+      success: true, 
+      message: 'Cover letter generated successfully',
+      data: coverLetterData.data
+    });
+  } catch (err) {
+    console.error('Generate Cover Letter error:', err);
     return res.status(500).json({ success: false, message: err.message });
   }
 });

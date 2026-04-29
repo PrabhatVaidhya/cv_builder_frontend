@@ -17,7 +17,9 @@
     "latex-to-pdf": "^1.0.37",
     "mongoos": "^0.0.1-security",
     "mongoose": "^8.19.3",
+    "multer": "^2.1.1",
     "node-latex": "^3.1.0",
+    "pdf-parse": "^1.1.1",
     "pdfkit": "^0.13.0"
   },
   "devDependencies": {

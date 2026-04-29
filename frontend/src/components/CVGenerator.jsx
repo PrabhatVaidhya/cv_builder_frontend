@@ -8,6 +8,8 @@ export default function CVGenerator({ userEmail }) {
   const [currentCV, setCurrentCV] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [currentCoverLetter, setCurrentCoverLetter] = useState(null);
+  const [generatingCL, setGeneratingCL] = useState(false);
 
   const apiEndpoint = import.meta.env.VITE_API_URL || 'https://cv-builder-frontend-1v0e.onrender.com';
 
@@ -65,7 +67,50 @@ export default function CVGenerator({ userEmail }) {
       setLoading(false);
     }
   };
+  const generateCoverLetter = async () => {
+    if (!jobDescription.trim()) {
+      alert('Please enter a job description');
+      return;
+    }
 
+    setGeneratingCL(true);
+    try {
+      const response = await fetch(`${apiEndpoint}/api/auth/generate-cover-letter`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: userEmail,
+          jobDescription
+        })
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setCurrentCoverLetter(data.data);
+        alert('Cover letter generated successfully!');
+      } else {
+        alert('Error: ' + data.message);
+      }
+    } catch (err) {
+      console.error('Generate cover letter error:', err);
+      alert('Failed to generate cover letter');
+    } finally {
+      setGeneratingCL(false);
+    }
+  };
+
+  const downloadCoverLetter = () => {
+    if (!currentCoverLetter) return;
+    const blob = new Blob([currentCoverLetter], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Cover_Letter_${positionTitle || 'Generated'}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  };
   const downloadCV = async (cvId) => {
     try {
       const response = await fetch(`${apiEndpoint}/api/auth/download-cv`, {
@@ -148,6 +193,7 @@ export default function CVGenerator({ userEmail }) {
     setCompanyName('');
     setPositionTitle('');
     setCurrentCV(null);
+    setCurrentCoverLetter(null);
   };
 
   const deleteCV = async (cvId) => {
@@ -242,7 +288,7 @@ Go, Kubernetes, Docker, gRPC, Google Cloud Platform, Microservices, Distributed 
     <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px' }}>
       <h2>Generate Tailored CV</h2>
       
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+      <div className="glass-panel" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', marginBottom: '20px', padding: '30px', textAlign: 'left' }}>
         <div>
           <h3>New Job Application</h3>
           <input
@@ -301,6 +347,22 @@ Go, Kubernetes, Docker, gRPC, Google Cloud Platform, Microservices, Distributed 
               {loading ? 'Generating...' : 'Generate CV'}
             </button>
             <button
+              onClick={generateCoverLetter}
+              disabled={generatingCL}
+              style={{
+                flex: 1,
+                padding: '12px',
+                backgroundColor: generatingCL ? '#ccc' : '#6f42c1',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: generatingCL ? 'not-allowed' : 'pointer',
+                fontWeight: 'bold'
+              }}
+            >
+              {generatingCL ? 'Writing...' : 'Write Cover Letter'}
+            </button>
+            <button
               onClick={clearForm}
               style={{
                 padding: '12px 20px',
@@ -350,9 +412,10 @@ Go, Kubernetes, Docker, gRPC, Google Cloud Platform, Microservices, Distributed 
                   style={{
                     padding: '15px',
                     marginBottom: '10px',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px',
-                    backgroundColor: '#f8f9fa'
+                    border: '1px solid var(--border-color)',
+                    borderRadius: '8px',
+                    backgroundColor: 'rgba(15, 23, 42, 0.4)',
+                    boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
                   }}
                 >
                   <h4 style={{ margin: '0 0 5px 0' }}>
@@ -421,12 +484,12 @@ Go, Kubernetes, Docker, gRPC, Google Cloud Platform, Microservices, Distributed 
           id="cv-preview"
           style={{ 
             marginTop: '30px', 
-            padding: '40px', 
-            border: '3px solid #007bff', 
-            borderRadius: '8px', 
+            padding: '60px', 
+            border: '1px solid var(--accent-primary)', 
+            borderRadius: '16px', 
             backgroundColor: '#ffffff',
-            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-            maxWidth: '900px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+            maxWidth: '800px',
             margin: '30px auto'
           }}
         >
@@ -448,7 +511,7 @@ Go, Kubernetes, Docker, gRPC, Google Cloud Platform, Microservices, Distributed 
           </div>
           <div style={{ 
             backgroundColor: '#ffffff', 
-            padding: '40px',
+            padding: '20px 40px',
             border: '1px solid #dee2e6',
             fontFamily: 'Arial, sans-serif',
             lineHeight: '1.6',
@@ -460,7 +523,7 @@ Go, Kubernetes, Docker, gRPC, Google Cloud Platform, Microservices, Distributed 
               <h1 style={{ fontSize: '24px', margin: '0 0 5px 0', textTransform: 'uppercase', letterSpacing: '1px' }}>
                 {currentCV.tailoredCV.personalInfo?.fullName || 'Your Name'}
               </h1>
-              <div style={{ fontSize: '10px', color: '#333' }}>
+              <div style={{ fontSize: '13px', color: '#333' }}>
                 {currentCV.tailoredCV.personalInfo?.email && <span>{currentCV.tailoredCV.personalInfo.email}</span>}
                 {currentCV.tailoredCV.personalInfo?.phone && <span> • {currentCV.tailoredCV.personalInfo.phone}</span>}
                 {currentCV.tailoredCV.personalInfo?.linkedin && <span> • {currentCV.tailoredCV.personalInfo.linkedin}</span>}
@@ -470,20 +533,20 @@ Go, Kubernetes, Docker, gRPC, Google Cloud Platform, Microservices, Distributed 
             {/* Summary */}
             {currentCV.tailoredCV.summary && (
               <div style={{ marginBottom: '15px' }}>
-                <h3 style={{ fontSize: '14px', fontWeight: 'bold', margin: '0 0 8px 0', textTransform: 'uppercase', borderBottom: '1px solid #000' }}>Summary</h3>
-                <p style={{ fontSize: '11px', margin: 0, textAlign: 'justify' }}>{currentCV.tailoredCV.summary}</p>
+                <h3 style={{ fontSize: '16px', fontWeight: 'bold', margin: '0 0 8px 0', textTransform: 'uppercase', borderBottom: '1px solid #000' }}>Summary</h3>
+                <p style={{ fontSize: '14px', margin: 0, textAlign: 'justify' }}>{currentCV.tailoredCV.summary}</p>
               </div>
             )}
 
             {/* Education */}
             {currentCV.tailoredCV.education && currentCV.tailoredCV.education.length > 0 && (
               <div style={{ marginBottom: '15px' }}>
-                <h3 style={{ fontSize: '14px', fontWeight: 'bold', margin: '0 0 8px 0', textTransform: 'uppercase', borderBottom: '1px solid #000' }}>Education</h3>
+                <h3 style={{ fontSize: '16px', fontWeight: 'bold', margin: '0 0 8px 0', textTransform: 'uppercase', borderBottom: '1px solid #000' }}>Education</h3>
                 {currentCV.tailoredCV.education.map((edu, idx) => (
-                  <div key={idx} style={{ marginBottom: '10px', fontSize: '11px' }}>
+                  <div key={idx} style={{ marginBottom: '10px', fontSize: '14px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <strong>{edu.degree} in {edu.field}</strong>
-                      <span style={{ fontStyle: 'italic', fontSize: '10px' }}>{edu.startDate} - {edu.endDate}</span>
+                      <span style={{ fontStyle: 'italic', fontSize: '12px' }}>{edu.startDate} - {edu.endDate}</span>
                     </div>
                     <div style={{ fontStyle: 'italic' }}>{edu.institution}</div>
                     {edu.gpa && <div>GPA: {edu.gpa}</div>}
@@ -495,17 +558,17 @@ Go, Kubernetes, Docker, gRPC, Google Cloud Platform, Microservices, Distributed 
             {/* Experience */}
             {currentCV.tailoredCV.experience && currentCV.tailoredCV.experience.length > 0 && (
               <div style={{ marginBottom: '15px' }}>
-                <h3 style={{ fontSize: '14px', fontWeight: 'bold', margin: '0 0 8px 0', textTransform: 'uppercase', borderBottom: '1px solid #000' }}>Experience</h3>
+                <h3 style={{ fontSize: '16px', fontWeight: 'bold', margin: '0 0 8px 0', textTransform: 'uppercase', borderBottom: '1px solid #000' }}>Experience</h3>
                 {currentCV.tailoredCV.experience.map((exp, idx) => (
-                  <div key={idx} style={{ marginBottom: '10px', fontSize: '11px' }}>
+                  <div key={idx} style={{ marginBottom: '10px', fontSize: '14px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <strong>{exp.position}</strong>
-                      <span style={{ fontStyle: 'italic', fontSize: '10px' }}>{exp.startDate} - {exp.endDate}</span>
+                      <span style={{ fontStyle: 'italic', fontSize: '12px' }}>{exp.startDate} - {exp.endDate}</span>
                     </div>
                     <div style={{ fontStyle: 'italic' }}>{exp.company}, {exp.location}</div>
                     {exp.achievements && exp.achievements.length > 0 && (
                       <ul style={{ margin: '5px 0 0 0', paddingLeft: '20px' }}>
-                        {exp.achievements.map((ach, i) => <li key={i} style={{ fontSize: '10px' }}>{ach}</li>)}
+                        {exp.achievements.map((ach, i) => <li key={i} style={{ fontSize: '13px' }}>{ach}</li>)}
                       </ul>
                     )}
                   </div>
@@ -516,18 +579,18 @@ Go, Kubernetes, Docker, gRPC, Google Cloud Platform, Microservices, Distributed 
             {/* Projects */}
             {currentCV.tailoredCV.projects && currentCV.tailoredCV.projects.length > 0 && (
               <div style={{ marginBottom: '15px' }}>
-                <h3 style={{ fontSize: '14px', fontWeight: 'bold', margin: '0 0 8px 0', textTransform: 'uppercase', borderBottom: '1px solid #000' }}>Projects</h3>
+                <h3 style={{ fontSize: '16px', fontWeight: 'bold', margin: '0 0 8px 0', textTransform: 'uppercase', borderBottom: '1px solid #000' }}>Projects</h3>
                 {currentCV.tailoredCV.projects.map((proj, idx) => (
-                  <div key={idx} style={{ marginBottom: '10px', fontSize: '11px' }}>
+                  <div key={idx} style={{ marginBottom: '10px', fontSize: '14px' }}>
                     <strong>{proj.name}</strong>
-                    {proj.summary && <div style={{ fontSize: '10px', fontStyle: 'italic' }}>{proj.summary}</div>}
+                    {proj.summary && <div style={{ fontSize: '12px', fontStyle: 'italic' }}>{proj.summary}</div>}
                     {proj.description && Array.isArray(proj.description) && (
                       <ul style={{ margin: '5px 0 0 0', paddingLeft: '20px' }}>
-                        {proj.description.map((desc, i) => <li key={i} style={{ fontSize: '10px' }}>{desc}</li>)}
+                        {proj.description.map((desc, i) => <li key={i} style={{ fontSize: '13px' }}>{desc}</li>)}
                       </ul>
                     )}
                     {proj.technologies && proj.technologies.length > 0 && (
-                      <div style={{ fontSize: '10px', marginTop: '3px' }}>
+                      <div style={{ fontSize: '13px', marginTop: '3px' }}>
                         <strong>Technologies:</strong> {proj.technologies.join(', ')}
                       </div>
                     )}
@@ -539,8 +602,8 @@ Go, Kubernetes, Docker, gRPC, Google Cloud Platform, Microservices, Distributed 
             {/* Skills */}
             {currentCV.tailoredCV.skills && (
               <div style={{ marginBottom: '15px' }}>
-                <h3 style={{ fontSize: '14px', fontWeight: 'bold', margin: '0 0 8px 0', textTransform: 'uppercase', borderBottom: '1px solid #000' }}>Skills</h3>
-                <div style={{ fontSize: '10px' }}>
+                <h3 style={{ fontSize: '16px', fontWeight: 'bold', margin: '0 0 8px 0', textTransform: 'uppercase', borderBottom: '1px solid #000' }}>Skills</h3>
+                <div style={{ fontSize: '13px' }}>
                   {currentCV.tailoredCV.skills.technical && currentCV.tailoredCV.skills.technical.length > 0 && (
                     <div style={{ marginBottom: '5px' }}>
                       <strong>Technical:</strong> {currentCV.tailoredCV.skills.technical.join(', ')}
@@ -563,8 +626,8 @@ Go, Kubernetes, Docker, gRPC, Google Cloud Platform, Microservices, Distributed 
             {/* Certifications */}
             {currentCV.tailoredCV.certifications && currentCV.tailoredCV.certifications.length > 0 && (
               <div style={{ marginBottom: '15px' }}>
-                <h3 style={{ fontSize: '14px', fontWeight: 'bold', margin: '0 0 8px 0', textTransform: 'uppercase', borderBottom: '1px solid #000' }}>Certifications</h3>
-                <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '10px' }}>
+                <h3 style={{ fontSize: '16px', fontWeight: 'bold', margin: '0 0 8px 0', textTransform: 'uppercase', borderBottom: '1px solid #000' }}>Certifications</h3>
+                <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '13px' }}>
                   {currentCV.tailoredCV.certifications.map((cert, idx) => <li key={idx}>{cert}</li>)}
                 </ul>
               </div>
@@ -573,12 +636,74 @@ Go, Kubernetes, Docker, gRPC, Google Cloud Platform, Microservices, Distributed 
             {/* Awards */}
             {currentCV.tailoredCV.awards && currentCV.tailoredCV.awards.length > 0 && (
               <div style={{ marginBottom: '15px' }}>
-                <h3 style={{ fontSize: '14px', fontWeight: 'bold', margin: '0 0 8px 0', textTransform: 'uppercase', borderBottom: '1px solid #000' }}>Awards & Achievements</h3>
-                <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '10px' }}>
+                <h3 style={{ fontSize: '16px', fontWeight: 'bold', margin: '0 0 8px 0', textTransform: 'uppercase', borderBottom: '1px solid #000' }}>Awards &amp; Achievements</h3>
+                <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '13px' }}>
                   {currentCV.tailoredCV.awards.map((award, idx) => <li key={idx}>{award}</li>)}
                 </ul>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {currentCoverLetter && (
+        <div 
+          id="cl-preview"
+          style={{ 
+            marginTop: '30px', 
+            padding: '40px', 
+            border: '1px solid var(--accent-primary)', 
+            borderRadius: '16px', 
+            backgroundColor: '#ffffff',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+            maxWidth: '800px',
+            margin: '30px auto'
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <h3 style={{ margin: 0, color: '#6f42c1' }}>✉️ Cover Letter Preview</h3>
+            <div>
+              <button
+                onClick={downloadCoverLetter}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: '#28a745',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  marginRight: '10px'
+                }}
+              >
+                Download TXT
+              </button>
+              <button
+                onClick={() => setCurrentCoverLetter(null)}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: '#6c757d',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+          <div style={{ 
+            backgroundColor: '#f8f9fa', 
+            padding: '30px',
+            border: '1px solid #dee2e6',
+            borderRadius: '4px',
+            fontFamily: 'Arial, sans-serif',
+            lineHeight: '1.6',
+            color: '#333',
+            textAlign: 'left',
+            whiteSpace: 'pre-wrap'
+          }}>
+            {currentCoverLetter}
           </div>
         </div>
       )}

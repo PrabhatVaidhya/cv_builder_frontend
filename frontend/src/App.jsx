@@ -1,14 +1,18 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import HomePage from './components/HomePage'
+import QuickGenerator from './components/QuickGenerator'
 import AuthPage from './components/AuthPage'
 import ProfileForm from './components/ProfileForm'
 import CVGenerator from './components/CVGenerator'
 import './App.css'
 
 function App() {
+  const [view, setView] = useState('home') // 'home', 'quick', 'pro'
   const [userEmail, setUserEmail] = useState('')
   const [loggedIn, setLoggedIn] = useState(false)
   const [profileCompleted, setProfileCompleted] = useState(false)
   const [loading, setLoading] = useState(true)
+  const fileInputRef = useRef(null)
 
   const apiEndpoint = import.meta.env.VITE_API_URL || 'https://cv-builder-frontend-1v0e.onrender.com';
 
@@ -17,6 +21,8 @@ function App() {
     if (email) {
       setUserEmail(email)
       setLoggedIn(true)
+      // Automatically go to 'pro' view if they are logged in and revisit
+      setView('pro')
       checkProfileStatus(email)
     } else {
       setLoading(false)
@@ -54,6 +60,7 @@ function App() {
     setUserEmail('')
     localStorage.removeItem('userEmail')
     localStorage.removeItem('userFullName')
+    setView('home')
   }
 
   if (loading) {
@@ -66,12 +73,34 @@ function App() {
     )
   }
 
+  if (view === 'home') {
+    return (
+      <div className="App">
+        <HomePage 
+          onSelectQuick={() => setView('quick')} 
+          onSelectPro={() => setView('pro')} 
+        />
+      </div>
+    )
+  }
+
+  if (view === 'quick') {
+    return (
+      <div className="App">
+        <QuickGenerator onBack={() => setView('home')} />
+      </div>
+    )
+  }
+
+  // PRO FLOW -----------------------------------------------------------------
+
   if (!loggedIn) {
     return (
       <div className="App">
         <header className="app-header">
-          <h1>🤖 AI-Powered CV Generator</h1>
-          <p className="subtitle">Create your account and build professional CVs tailored to any job</p>
+          <button onClick={() => setView('home')} style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', float: 'left' }}>← Back</button>
+          <h1>💼 Pro Setup</h1>
+          <p className="subtitle">Create your account and build a reusable professional profile</p>
         </header>
         <main className="app-main">
           <AuthPage onLogin={handleLogin} />
@@ -84,8 +113,8 @@ function App() {
     return (
       <div className="App">
         <header className="app-header">
-          <h1>🤖 AI-Powered CV Generator</h1>
-          <p className="subtitle">Welcome! Let's set up your profile first</p>
+          <h1>💼 Pro Setup</h1>
+          <p className="subtitle">Welcome! Let's set up your master profile first</p>
           <button
             onClick={handleLogout}
             style={{
@@ -114,13 +143,71 @@ function App() {
     setProfileCompleted(false);
   };
 
+  const handleExportProfile = async () => {
+    try {
+      const response = await fetch(`${apiEndpoint}/api/auth/profile/${userEmail}`);
+      const data = await response.json();
+      if (data.success) {
+        const jsonString = JSON.stringify(data.data, null, 2);
+        const blob = new Blob([jsonString], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${data.data.fullName ? data.data.fullName.replace(/\\s+/g, '_') : 'profile'}_data.json`;
+        document.body.appendChild(a);
+        a.click();
+        URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      } else {
+        alert('Failed to export profile');
+      }
+    } catch (err) {
+      console.error('Export error:', err);
+      alert('Error exporting profile');
+    }
+  };
+
+  const handleImportProfile = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const jsonData = JSON.parse(e.target.result);
+        delete jsonData._id;
+        delete jsonData.id;
+        delete jsonData.passwordHash;
+        jsonData.profileCompleted = true;
+
+        const response = await fetch(`${apiEndpoint}/api/auth/profile`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: userEmail, profileData: jsonData })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+          alert('Profile imported successfully!');
+          setProfileCompleted(true);
+        } else {
+          alert('Failed to import profile: ' + data.message);
+        }
+      } catch (err) {
+        console.error('Import error:', err);
+        alert('Invalid JSON file');
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = null;
+  };
+
   const handleViewProfile = async () => {
     try {
       const response = await fetch(`${apiEndpoint}/api/auth/profile/${userEmail}`);
       const data = await response.json();
       if (data.success) {
         alert('Opening profile view...');
-        // Store profile data to show in modal or new component
         const profileWindow = window.open('', 'Profile', 'width=800,height=600');
         profileWindow.document.write(`
           <html>
@@ -141,99 +228,11 @@ function App() {
           <body>
             <div class="container">
               <h1>📋 My Profile</h1>
-              
               <div class="section">
                 <h2>Personal Information</h2>
                 <div class="info-item"><strong>Full Name:</strong> ${data.data.fullName || 'Not provided'}</div>
                 <div class="info-item"><strong>Email:</strong> ${data.data.email || 'Not provided'}</div>
-                <div class="info-item"><strong>Phone:</strong> ${data.data.personalInfo?.phone || 'Not provided'}</div>
-                <div class="info-item"><strong>LinkedIn:</strong> ${data.data.personalInfo?.linkedin || 'Not provided'}</div>
               </div>
-              
-              ${data.data.summary ? `
-              <div class="section">
-                <h2>Professional Summary</h2>
-                <p>${data.data.summary}</p>
-              </div>
-              ` : ''}
-              
-              ${data.data.education && data.data.education.length > 0 ? `
-              <div class="section">
-                <h2>Education</h2>
-                ${data.data.education.map(edu => `
-                  <div style="margin-bottom: 15px;">
-                    <strong>${edu.degree} in ${edu.field}</strong><br>
-                    <em>${edu.institution}</em><br>
-                    ${edu.startDate} - ${edu.endDate}
-                    ${edu.gpa ? `<br>GPA: ${edu.gpa}` : ''}
-                  </div>
-                `).join('')}
-              </div>
-              ` : ''}
-              
-              ${data.data.experience && data.data.experience.length > 0 ? `
-              <div class="section">
-                <h2>Experience</h2>
-                ${data.data.experience.map(exp => `
-                  <div style="margin-bottom: 15px;">
-                    <strong>${exp.position}</strong> at ${exp.company}<br>
-                    <em>${exp.location}</em><br>
-                    ${exp.startDate} - ${exp.endDate}
-                    ${exp.achievements && exp.achievements.length > 0 ? `
-                      <ul>${exp.achievements.map(a => `<li>${a}</li>`).join('')}</ul>
-                    ` : ''}
-                  </div>
-                `).join('')}
-              </div>
-              ` : ''}
-              
-              ${data.data.projects && data.data.projects.length > 0 ? `
-              <div class="section">
-                <h2>Projects</h2>
-                ${data.data.projects.map(proj => `
-                  <div style="margin-bottom: 15px;">
-                    <strong>${proj.name}</strong><br>
-                    ${proj.summary ? `<p>${proj.summary}</p>` : ''}
-                    ${proj.description && proj.description.length > 0 ? `
-                      <ul>${proj.description.map(d => `<li>${d}</li>`).join('')}</ul>
-                    ` : ''}
-                    ${proj.technologies && proj.technologies.length > 0 ? `
-                      <div><strong>Technologies:</strong> ${proj.technologies.join(', ')}</div>
-                    ` : ''}
-                  </div>
-                `).join('')}
-              </div>
-              ` : ''}
-              
-              ${data.data.skills ? `
-              <div class="section">
-                <h2>Skills</h2>
-                ${data.data.skills.technical && data.data.skills.technical.length > 0 ? `
-                  <div class="info-item"><strong>Technical:</strong> ${data.data.skills.technical.join(', ')}</div>
-                ` : ''}
-                ${data.data.skills.frameworks && data.data.skills.frameworks.length > 0 ? `
-                  <div class="info-item"><strong>Frameworks:</strong> ${data.data.skills.frameworks.join(', ')}</div>
-                ` : ''}
-                ${data.data.skills.tools && data.data.skills.tools.length > 0 ? `
-                  <div class="info-item"><strong>Tools:</strong> ${data.data.skills.tools.join(', ')}</div>
-                ` : ''}
-              </div>
-              ` : ''}
-              
-              ${data.data.certifications && data.data.certifications.length > 0 ? `
-              <div class="section">
-                <h2>Certifications</h2>
-                <ul>${data.data.certifications.map(c => `<li>${c}</li>`).join('')}</ul>
-              </div>
-              ` : ''}
-              
-              ${data.data.awards && data.data.awards.length > 0 ? `
-              <div class="section">
-                <h2>Awards & Achievements</h2>
-                <ul>${data.data.awards.map(a => `<li>${a}</li>`).join('')}</ul>
-              </div>
-              ` : ''}
-              
               <button onclick="window.print()" style="margin-top: 20px; padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">Print Profile</button>
               <button onclick="window.close()" style="margin-top: 20px; margin-left: 10px; padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">Close</button>
             </div>
@@ -253,45 +252,13 @@ function App() {
         <h1>🤖 AI-Powered CV Generator</h1>
         <p className="subtitle">Generate tailored CVs for different jobs using your saved profile</p>
         <div style={{ position: 'absolute', top: '20px', right: '20px', display: 'flex', gap: '10px' }}>
-          <button
-            onClick={handleViewProfile}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#17a2b8',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}
-          >
-            View My Profile
-          </button>
-          <button
-            onClick={handleEditProfile}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#28a745',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}
-          >
-            Edit Profile
-          </button>
-          <button
-            onClick={handleLogout}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#dc3545',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}
-          >
-            Logout
-          </button>
+          <button onClick={() => setView('home')} style={{ padding: '8px 16px', backgroundColor: '#6c757d', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Home</button>
+          <button onClick={handleViewProfile} style={{ padding: '8px 16px', backgroundColor: '#17a2b8', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>View Profile</button>
+          <button onClick={handleEditProfile} style={{ padding: '8px 16px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Edit Profile</button>
+          <button onClick={handleExportProfile} style={{ padding: '8px 16px', backgroundColor: '#6f42c1', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Export JSON</button>
+          <input type="file" ref={fileInputRef} onChange={handleImportProfile} accept=".json" style={{ display: 'none' }} />
+          <button onClick={() => fileInputRef.current.click()} style={{ padding: '8px 16px', backgroundColor: '#fd7e14', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Import JSON</button>
+          <button onClick={handleLogout} style={{ padding: '8px 16px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Logout</button>
         </div>
       </header>
       

@@ -106,14 +106,13 @@ IMPORTANT INSTRUCTIONS:
 5. **Optimize Skills Section**: Reorder and highlight skills that match job requirements
 6. **Competitions/Awards**: Add relevant competitions or achievements if applicable to the domain
 
-**RULES FOR GENERATED CONTENT:**
-- Make it realistic and believable
-- Use specific numbers and metrics
-- Match the user's education level and timeline
-- Don't contradict existing profile information
-- Keep technical depth appropriate to the role level
-- Generate 2-4 bullet points per project/experience
-- Use action verbs and quantifiable achievements
+**RULES FOR GENERATED CONTENT & WRITING STYLE:**
+- **NO LATEX**: NEVER use LaTeX syntax (like \\textbf{}, \\textit{}, \\item). Use plain simple text only.
+- **Writing Style**: Mimic a top-tier engineering resume. Use highly professional, technical language, focusing on depth and impact.
+- **Structure of Bullets**: Each bullet point MUST be HIGHLY DETAILED and LONG (approximately 25-40 words), spanning 2 to 3 lines. It must be packed with technical density to fill the horizontal lines completely. Do NOT write short, sparse bullets.
+- **Density**: Ensure there is NO unused space in the lines. The content must NOT look half-filled. Fully optimize every bullet point.
+- **Quantity**: Generate exactly 4-6 dense, multi-line bullet points per project and experience to ensure the physical page is 100% full to the bottom.
+- **Realism**: Make it extremely realistic, believable, and technically sound without contradicting existing profile info.
 
 Return ONLY valid JSON (no markdown, no code blocks) with the complete profile structure including both existing and newly generated content.
 
@@ -403,9 +402,54 @@ function createFallbackStructure(userText) {
   };
 }
 
+const COVER_LETTER_PROMPT = `You are an expert career consultant. Write a professional, compelling cover letter based on the provided user profile and job description.
+The cover letter should:
+1. Have a standard business letter format (without the sender/receiver physical addresses, just start with a Salutation like 'Dear Hiring Manager,').
+2. Be tailored to the specific job description, highlighting matching skills and experiences from the profile.
+3. Be professional, engaging, and concise (max 3-4 paragraphs).
+4. End with a professional closing and the user's name.
+
+Return the cover letter as a raw text string. Do not use markdown blocks or JSON, just plain text.`;
+
+async function generateCoverLetter(userProfile, jobDescription) {
+  try {
+    const profileJson = JSON.stringify(userProfile, null, 2);
+    const prompt = `${COVER_LETTER_PROMPT}\n\nJob Description:\n${jobDescription}\n\nUser Profile:\n${profileJson}\n\nCover Letter:\n`;
+    
+    const chatCompletion = await groq.chat.completions.create({
+      messages: [
+        {
+          role: 'user',
+          content: prompt
+        }
+      ],
+      model: 'llama-3.3-70b-versatile',
+      temperature: 0.6,
+      max_tokens: 1500,
+    });
+    
+    let text = chatCompletion.choices[0]?.message?.content || '';
+    if (text.startsWith('```')) {
+        text = text.replace(/```[a-zA-Z]*\n?/g, '').replace(/```\n?/g, '');
+    }
+    
+    return {
+      success: true,
+      data: text.trim()
+    };
+  } catch (error) {
+    console.error('AI cover letter error:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+}
+
 module.exports = {
   parseProfileWithAI,
   tailorCVForJob,
   calculateCosineSimilarity,
-  extractCVText
+  extractCVText,
+  generateCoverLetter
 };

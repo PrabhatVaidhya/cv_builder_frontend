@@ -30,8 +30,12 @@ async function findUserByEmail(email) {
 
 async function updateUserProfile(email, profileData) {
   if (mongoose.connection.readyState !== 1) {
-    const user = inMemoryUsers.get(email);
-    if (!user) throw new Error('User not found');
+    let user = inMemoryUsers.get(email);
+    if (!user) {
+      // Auto-create user if missing (happens when server restarts but frontend has localStorage)
+      user = { fullName: profileData?.personalInfo?.fullName || email.split('@')[0], email, passwordHash: '', profileCompleted: false, createdAt: new Date() };
+      inMemoryUsers.set(email, user);
+    }
     
     // Merge arrays instead of replacing
     if (profileData.education && user.education) {
@@ -56,8 +60,11 @@ async function updateUserProfile(email, profileData) {
   }
 
   // Get existing user first to merge arrays
-  const existingUser = await User.findOne({ email });
-  if (!existingUser) throw new Error('User not found');
+  let existingUser = await User.findOne({ email });
+  if (!existingUser) {
+    existingUser = new User({ fullName: profileData?.personalInfo?.fullName || email.split('@')[0], email, passwordHash: 'placeholder_hash' });
+    await existingUser.save();
+  }
   
   // Merge arrays
   if (profileData.education && existingUser.education.length > 0) {

@@ -43,7 +43,12 @@ app.get('/api/ping', (req, res) => {
 });
 
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'healthy', service: 'cv-generator-backend' });
+  res.json({ 
+    status: 'healthy', 
+    service: 'cv-generator-backend',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
 });
 
 // CV Routes
